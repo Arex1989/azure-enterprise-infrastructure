@@ -53,7 +53,7 @@ This project will progressively use:
 
 ### Current Phase
 
-Azure networking and network segmentation.
+Network security and traffic control using Azure Network Security Groups.
 
 ## Resource Organisation
 
@@ -75,6 +75,34 @@ The project uses the following Azure resource organisation:
 | ManagedBy | Manual |
 
 The environment is currently being deployed manually through the Azure Portal to develop practical understanding of each Azure component before recreating the infrastructure using Terraform.
+
+## Network Architecture
+
+The Azure environment uses a segmented virtual network to separate
+workloads based on their function and security requirements.
+
+### Virtual Network
+
+| Component | Configuration |
+|---|---|
+| VNet | vnet-enterprise-dev |
+| Address Space | 10.10.0.0/16 |
+| Region | UK South |
+| Resource Group | rg-azure-enterprise-dev |
+
+### Subnet Design
+
+| Subnet | Address Range | Purpose |
+|---|---|---|
+| snet-web | 10.10.1.0/24 | Web-facing workloads |
+| snet-app | 10.10.2.0/24 | Application workloads |
+| snet-management | 10.10.3.0/24 | Administrative and management workloads |
+
+The /16 VNet provides sufficient address capacity for future expansion,
+while dedicated /24 subnets provide logical workload segmentation.
+
+This design prepares the environment for Network Security Groups (NSGs)
+that will be used to control traffic between network tiers.
 
 ## Planned Project Phases
 
