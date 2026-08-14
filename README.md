@@ -42,7 +42,39 @@ This project will progressively use:
 
 🟡 In Progress
 
-Current phase: Project planning and environment preparation.
+### Completed
+
+- Created a dedicated Azure subscription for the lab environment
+- Configured a monthly Azure cost budget with 50%, 75% and 90% actual-cost alerts
+- Selected UK South as the primary deployment region
+- Established an enterprise-style resource naming convention
+- Created the development resource group `rg-azure-enterprise-dev`
+- Implemented resource tagging for environment, project, purpose and management method
+
+### Current Phase
+
+Azure networking and network segmentation.
+
+## Resource Organisation
+
+The project uses the following Azure resource organisation:
+
+| Resource | Name | Purpose |
+|---|---|---|
+| Subscription | Azure subscription 1 | Billing and resource management boundary |
+| Resource Group | rg-azure-enterprise-dev | Logical container for development infrastructure |
+| Primary Region | UK South | Primary deployment region |
+
+### Resource Tags
+
+| Tag | Value |
+|---|---|
+| Environment | Development |
+| Project | AzureEnterpriseLab |
+| Purpose | CloudEngineeringPortfolio |
+| ManagedBy | Manual |
+
+The environment is currently being deployed manually through the Azure Portal to develop practical understanding of each Azure component before recreating the infrastructure using Terraform.
 
 ## Planned Project Phases
 
