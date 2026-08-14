@@ -58,7 +58,9 @@ This project will progressively use:
 
 ### Current Phase
 
-Compute deployment and integration of Azure Virtual Machines with the segmented network architecture.
+Cloud storage, identity, security and operational services.
+
+> **Compute deployment note:** Azure Virtual Machine deployment was evaluated using free-services-eligible B-series SKUs. VM deployment is currently restricted by subscription-level regional/SKU availability. Compute implementation has therefore been deferred while the remaining infrastructure, security, monitoring and Infrastructure as Code components are developed.
 
 ## Resource Organisation
 
