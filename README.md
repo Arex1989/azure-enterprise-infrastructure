@@ -44,20 +44,21 @@ This project will progressively use:
 
 ### Completed
 
-- Created dedicated Network Security Groups for the web, application and management tiers
-- Associated `nsg-web-dev` with `snet-web`, `nsg-app-dev` with `snet-app`, and `nsg-management-dev` with `snet-management`
-- Configured a custom inbound HTTPS rule on the web tier to allow TCP/443 traffic while retaining Azure's default deny behavior for unmatched inbound traffic
-
 - Created a dedicated Azure subscription for the lab environment
 - Configured a monthly Azure cost budget with 50%, 75% and 90% actual-cost alerts
 - Selected UK South as the primary deployment region
 - Established an enterprise-style resource naming convention
 - Created the development resource group `rg-azure-enterprise-dev`
 - Implemented resource tagging for environment, project, purpose and management method
+- Designed and deployed `vnet-enterprise-dev` using a `10.10.0.0/16` private address space
+- Segmented the virtual network into dedicated web, application and management `/24` subnets
+- Created dedicated Network Security Groups for the web, application and management tiers
+- Associated `nsg-web-dev` with `snet-web`, `nsg-app-dev` with `snet-app`, and `nsg-management-dev` with `snet-management`
+- Configured a custom inbound HTTPS rule on the web tier to allow TCP/443 traffic while retaining Azure's default deny behaviour for unmatched inbound traffic
 
 ### Current Phase
 
-Network security and traffic control using Azure Network Security Groups.
+Compute deployment and integration of Azure Virtual Machines with the segmented network architecture.
 
 ## Resource Organisation
 
@@ -117,8 +118,7 @@ Application and management tiers are not directly exposed through custom Interne
 The /16 VNet provides sufficient address capacity for future expansion,
 while dedicated /24 subnets provide logical workload segmentation.
 
-This design prepares the environment for Network Security Groups (NSGs)
-that will be used to control traffic between network tiers.
+The segmented network is protected using dedicated Network Security Groups (NSGs) for the web, application and management tiers. Custom traffic rules are introduced only where required by the workload architecture, following least-privilege principles.
 
 ## Planned Project Phases
 
