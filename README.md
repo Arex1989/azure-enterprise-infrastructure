@@ -44,6 +44,10 @@ This project will progressively use:
 
 ### Completed
 
+- Created dedicated Network Security Groups for the web, application and management tiers
+- Associated `nsg-web-dev` with `snet-web`, `nsg-app-dev` with `snet-app`, and `nsg-management-dev` with `snet-management`
+- Configured a custom inbound HTTPS rule on the web tier to allow TCP/443 traffic while retaining Azure's default deny behavior for unmatched inbound traffic
+
 - Created a dedicated Azure subscription for the lab environment
 - Configured a monthly Azure cost budget with 50%, 75% and 90% actual-cost alerts
 - Selected UK South as the primary deployment region
@@ -80,6 +84,18 @@ The environment is currently being deployed manually through the Azure Portal to
 
 The Azure environment uses a segmented virtual network to separate
 workloads based on their function and security requirements.
+
+### Network Security Design
+
+| Network Security Group | Associated Subnet | Security Purpose |
+| ---------------------- | ----------------- | ---------------- |
+| nsg-web-dev | snet-web | Controls inbound and outbound traffic for web-tier workloads |
+| nsg-app-dev | snet-app | Protects application-tier workloads from unnecessary direct access |
+| nsg-management-dev | snet-management | Provides a dedicated security boundary for administrative workloads |
+
+The web-tier NSG currently permits inbound HTTPS traffic over TCP port 443 using a custom priority 100 rule.
+
+Application and management tiers are not directly exposed through custom Internet-facing inbound rules. Additional access will be introduced only where required by the workload architecture, following least-privilege principles.
 
 ### Virtual Network
 
