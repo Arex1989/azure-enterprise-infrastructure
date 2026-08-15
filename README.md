@@ -44,6 +44,17 @@ This project will progressively use:
 
 ### Completed
 
+- Created a dedicated Azure subscription for the lab environment
+- Configured a monthly Azure cost budget with 50%, 75% and 90% actual-cost alerts
+- Selected UK South as the primary deployment region
+- Established an enterprise-style resource naming convention
+- Created the development resource group `rg-azure-enterprise-dev`
+- Implemented resource tagging for environment, project, purpose and management method
+- Designed and deployed `vnet-enterprise-dev` using a `10.10.0.0/16` private address space
+- Segmented the virtual network into dedicated web, application and management `/24` subnets
+- Created dedicated Network Security Groups for the web, application and management tiers
+- Associated `nsg-web-dev` with `snet-web`, `nsg-app-dev` with `snet-app`, and `nsg-management-dev` with `snet-management`
+- Configured a custom inbound HTTPS rule on the web tier to allow TCP/443 traffic while retaining Azure's default deny behavior for unmatched inbound traffic
 - Created a Standard LRS Azure Storage Account in UK South for enterprise application data
 - Restricted storage network access to approved networks using the `Microsoft.Storage` service endpoint on `snet-app`
 - Configured temporary client-IP access for controlled administrative testing without exposing the storage account to all public networks
@@ -147,7 +158,7 @@ Temporary client-IP access was introduced for controlled administrative testing 
 
 ### Identity and Access Control
 
-Microsoft Entra ID is used as the default authorization method for Azure Storage administration.
+Microsoft Entra ID is configured as the default authorization method for Azure Storage data access through the Azure portal.
 
 The `Storage Blob Data Contributor` Azure RBAC role was assigned to provide authenticated data-plane permissions for Blob operations without relying on storage account keys for routine access.
 
@@ -177,19 +188,19 @@ These tests confirmed that the configured controls provide protection against bo
 
 ## Planned Project Phases
 
-1. Architecture and requirements
-2. Azure subscription and cost controls
-3. Resource organization
-4. Virtual network and subnet design
-5. Network security
-6. Compute deployment
-7. Identity and RBAC
-8. Storage
-9. Monitoring and logging
-10. Backup and recovery
-11. Infrastructure testing
-12. Terraform Infrastructure as Code
-13. Final architecture documentation
+1. ✅ Architecture and requirements
+2. ✅ Azure subscription and cost controls
+3. ✅ Resource organization
+4. ✅ Virtual network and subnet design
+5. ✅ Network security
+6. ⏸️ Compute deployment — deferred due to subscription-level VM availability
+7. 🟡 Identity and RBAC — in progress
+8. ✅ Storage
+9. ⬜ Monitoring and logging
+10. ⬜ Backup and recovery
+11. ⬜ Infrastructure testing
+12. ⬜ Terraform Infrastructure as Code
+13. ⬜ Final architecture documentation
 
 ## Learning Objectives
 
