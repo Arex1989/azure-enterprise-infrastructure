@@ -4,11 +4,11 @@
 
 This project demonstrates the design and implementation of a secure and supportable Microsoft Azure infrastructure environment for a fictional organization.
 
-The project is being developed as a hands-on cloud engineering lab to demonstrate practical experience across cloud infrastructure, networking, identity, security, monitoring, automation and Infrastructure as Code.
+The project is being developed as a hands-on cloud engineering environment to demonstrate practical implementation across cloud infrastructure, networking, identity, security, monitoring, automation and Infrastructure as Code.
 
 ## Business Scenario
 
-A growing organization requires a secure Azure environment to host business workloads.
+A growing organization requires a secure, scalable and supportable Azure environment for hosting business workloads while maintaining controlled access, operational visibility, data protection and repeatable infrastructure delivery.
 
 The infrastructure must provide:
 
