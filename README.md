@@ -44,21 +44,17 @@ This project will progressively use:
 
 ### Completed
 
-- Created a dedicated Azure subscription for the lab environment
-- Configured a monthly Azure cost budget with 50%, 75% and 90% actual-cost alerts
-- Selected UK South as the primary deployment region
-- Established an enterprise-style resource naming convention
-- Created the development resource group `rg-azure-enterprise-dev`
-- Implemented resource tagging for environment, project, purpose and management method
-- Designed and deployed `vnet-enterprise-dev` using a `10.10.0.0/16` private address space
-- Segmented the virtual network into dedicated web, application and management `/24` subnets
-- Created dedicated Network Security Groups for the web, application and management tiers
-- Associated `nsg-web-dev` with `snet-web`, `nsg-app-dev` with `snet-app`, and `nsg-management-dev` with `snet-management`
-- Configured a custom inbound HTTPS rule on the web tier to allow TCP/443 traffic while retaining Azure's default deny behaviour for unmatched inbound traffic
+- Created a Standard LRS Azure Storage Account in UK South for enterprise application data
+- Restricted storage network access to approved networks using the `Microsoft.Storage` service endpoint on `snet-app`
+- Configured temporary client-IP access for controlled administrative testing without exposing the storage account to all public networks
+- Implemented Microsoft Entra ID authorization and assigned `Storage Blob Data Contributor` RBAC permissions for authenticated data-plane access
+- Disabled anonymous Blob access and enforced secure transfer with TLS 1.2
+- Implemented 7-day soft-delete protection for blobs and containers and enabled Blob Versioning
+- Validated Blob Versioning by overwriting a test configuration object and successfully accessing the retained previous version
+- Validated Soft Delete by deliberately deleting and successfully recovering a protected Blob object
 
 ### Current Phase
-
-Cloud storage, identity, security and operational services.
+Microsoft Entra ID, Azure RBAC and identity-based access control.
 
 > **Compute deployment note:** Azure Virtual Machine deployment was evaluated using free-services-eligible B-series SKUs. VM deployment is currently restricted by subscription-level regional/SKU availability. Compute implementation has therefore been deferred while the remaining infrastructure, security, monitoring and Infrastructure as Code components are developed.
 
@@ -121,6 +117,63 @@ The /16 VNet provides sufficient address capacity for future expansion,
 while dedicated /24 subnets provide logical workload segmentation.
 
 The segmented network is protected using dedicated Network Security Groups (NSGs) for the web, application and management tiers. Custom traffic rules are introduced only where required by the workload architecture, following least-privilege principles.
+
+## Storage Architecture
+
+The environment includes an Azure Storage Account for secure application and business data storage.
+
+### Storage Configuration
+
+| Component | Configuration |
+| --- | --- |
+| Storage Account | stazureenterprisedev |
+| Primary Service | Azure Blob Storage |
+| Region | UK South |
+| Performance | Standard |
+| Redundancy | Locally Redundant Storage (LRS) |
+| Access Tier | Hot |
+| Blob Container | enterprise-data |
+| Anonymous Access | Disabled |
+| Minimum TLS | TLS 1.2 |
+| Encryption | Microsoft-managed keys |
+
+### Network Security
+
+Storage network access is restricted to selected networks rather than being exposed to all public networks.
+
+The `snet-app` subnet is authorised through a `Microsoft.Storage` service endpoint, allowing application-tier workloads to access the storage service through the approved Azure network path.
+
+Temporary client-IP access was introduced for controlled administrative testing without changing the storage account to unrestricted public network access.
+
+### Identity and Access Control
+
+Microsoft Entra ID is used as the default authorization method for Azure Storage administration.
+
+The `Storage Blob Data Contributor` Azure RBAC role was assigned to provide authenticated data-plane permissions for Blob operations without relying on storage account keys for routine access.
+
+This demonstrated the distinction between:
+
+- Azure management-plane permissions
+- Storage data-plane permissions
+- Network-level access controls
+
+### Data Protection
+
+The following data-protection controls were implemented:
+
+- Blob soft delete with a 7-day retention period
+- Container soft delete with a 7-day retention period
+- Blob Versioning
+- Encryption at rest using Microsoft-managed keys
+- Secure transfer for data in transit
+
+### Validation Testing
+
+Blob Versioning was validated by uploading an initial configuration object, modifying the object, and uploading the updated version under the same name. Azure retained the previous version and allowed it to be accessed through version history.
+
+Soft Delete was validated by deliberately deleting the test Blob and successfully recovering it during the configured retention period.
+
+These tests confirmed that the configured controls provide protection against both accidental modification and accidental deletion.
 
 ## Planned Project Phases
 
