@@ -63,9 +63,15 @@ This project will progressively use:
 - Implemented 7-day soft-delete protection for blobs and containers and enabled Blob Versioning
 - Validated Blob Versioning by overwriting a test configuration object and successfully accessing the retained previous version
 - Validated Soft Delete by deliberately deleting and successfully recovering a protected Blob object
+- Created Microsoft Entra ID security groups to implement group-based access management rather than relying on direct user-level role assignments
+- Assigned `Storage Blob Data Contributor` to `grp-storage-users` at storage-account scope, providing controlled Blob data-plane access through group membership
+- Removed the redundant direct user-level Blob role assignment and validated that storage access continued through Entra security-group membership
+- Created `grp-cloud-operations` and assigned the built-in `Contributor` role at `rg-azure-enterprise-dev` scope for infrastructure-management access without role-assignment privileges
+- Created `grp-cloud-readers` and assigned the built-in `Reader` role at resource-group scope to provide read-only infrastructure visibility
+- Validated group-based RBAC behaviour and resolved an authorization issue caused by missing group membership and stale authentication-session information
 
 ### Current Phase
-Microsoft Entra ID, Azure RBAC and identity-based access control.
+Azure Monitor, Log Analytics and operational observability.
 
 > **Compute deployment note:** Azure Virtual Machine deployment was evaluated using free-services-eligible B-series SKUs. VM deployment is currently restricted by subscription-level regional/SKU availability. Compute implementation has therefore been deferred while the remaining infrastructure, security, monitoring and Infrastructure as Code components are developed.
 
@@ -186,6 +192,67 @@ Soft Delete was validated by deliberately deleting the test Blob and successfull
 
 These tests confirmed that the configured controls provide protection against both accidental modification and accidental deletion.
 
+## Identity and RBAC Architecture
+
+Microsoft Entra ID security groups and Azure Role-Based Access Control (RBAC) are used to provide role-based access to infrastructure and data resources.
+
+The access model follows least-privilege principles by assigning permissions to security groups at the minimum practical Azure scope rather than relying on broad direct user assignments.
+
+### Security Group Design
+
+| Security Group | Azure Role | Scope | Purpose |
+| --- | --- | --- | --- |
+| grp-storage-users | Storage Blob Data Contributor | stazureenterprisedev | Authenticated Blob data operations |
+| grp-cloud-readers | Reader | rg-azure-enterprise-dev | Read-only infrastructure visibility |
+| grp-cloud-operations | Contributor | rg-azure-enterprise-dev | Infrastructure resource management |
+
+### RBAC Design
+
+Azure RBAC assignments in the environment are based on three components:
+
+- **Security principal** — the Microsoft Entra ID user or group receiving access
+- **Role definition** — the set of permitted actions
+- **Scope** — the Azure boundary where those permissions apply
+
+Group-based assignments are preferred over direct user-level assignments to simplify access administration and provide a more scalable joiner, mover and leaver model.
+
+### Storage Data Access
+
+Blob data access is provided through membership of `grp-storage-users`.
+
+The group is assigned the `Storage Blob Data Contributor` role at the `stazureenterprisedev` storage-account scope, allowing authorised members to perform Blob data operations without requiring individual role assignments.
+
+A previously assigned direct user-level Blob role was removed and access was successfully validated through group membership alone.
+
+### Infrastructure Operations
+
+`grp-cloud-operations` is assigned the built-in `Contributor` role at `rg-azure-enterprise-dev` scope.
+
+This allows the group to manage resources within the development environment while separating infrastructure-management capability from Azure RBAC role-assignment authority.
+
+### Read-Only Access
+
+`grp-cloud-readers` is assigned the built-in `Reader` role at `rg-azure-enterprise-dev` scope.
+
+This provides visibility into infrastructure configuration without granting permission to modify resources.
+
+### RBAC Validation and Troubleshooting
+
+Group-based Blob access was tested by removing the direct `Storage Blob Data Contributor` assignment from the test user.
+
+Initial access failed because the user was configured as a group owner but had not been added as a group member. After correcting group membership, the existing Azure authentication session still returned an authorization error.
+
+A complete sign-out and reauthentication refreshed the Microsoft Entra authentication context, after which Blob access succeeded through `grp-storage-users`.
+
+This validation demonstrated:
+
+- The distinction between group ownership and group membership
+- Group-based inheritance of Azure RBAC permissions
+- The difference between management-plane and data-plane authorization
+- The importance of RBAC scope
+- Authentication-session and token refresh considerations following identity changes
+- The operational benefits of group-based access management
+
 ## Planned Project Phases
 
 1. ✅ Architecture and requirements
@@ -194,9 +261,9 @@ These tests confirmed that the configured controls provide protection against bo
 4. ✅ Virtual network and subnet design
 5. ✅ Network security
 6. ⏸️ Compute deployment — deferred due to subscription-level VM availability
-7. 🟡 Identity and RBAC — in progress
+7. ✅ Identity and RBAC
 8. ✅ Storage
-9. ⬜ Monitoring and logging
+9. 🟡 Monitoring and logging — in progress
 10. ⬜ Backup and recovery
 11. ⬜ Infrastructure testing
 12. ⬜ Terraform Infrastructure as Code
