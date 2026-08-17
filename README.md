@@ -69,9 +69,22 @@ This project will progressively use:
 - Created `grp-cloud-operations` and assigned the built-in `Contributor` role at `rg-azure-enterprise-dev` scope for infrastructure-management access without role-assignment privileges
 - Created `grp-cloud-readers` and assigned the built-in `Reader` role at resource-group scope to provide read-only infrastructure visibility
 - Validated group-based RBAC behaviour and resolved an authorization issue caused by missing group membership and stale authentication-session information
+- Created the `law-azure-enterprise-dev` Log Analytics workspace in UK South using the Pay-as-you-go pricing tier
+- Configured Log Analytics data retention and enabled a 0.1 GB/day ingestion cap to control monitoring costs
+- Configured Azure Storage diagnostic settings using `diag-blob-to-law` to send Blob Read, Write and Delete logs to Log Analytics
+- Validated Azure Blob Storage telemetry ingestion through the `StorageBlobLogs` table
+- Used KQL to investigate Blob read, write and delete activity, authentication methods, HTTP status codes and failed operations
+- Created a reusable `Enterprise Blob Operations Audit` KQL query for investigating Blob activity
+- Created an Azure Monitor log-search alert `alert-blob-failures-dev` to detect failed Blob operations
+- Configured the alert to evaluate failed Blob operations using a 30-minute aggregation and evaluation period with a threshold of greater than zero matching events
+- Created the `ag-azure-enterprise-dev` Action Group with email notification delivery
+- Successfully validated the complete Azure Monitor alerting pipeline by generating Blob failures, confirming the events in Log Analytics, triggering the Azure Monitor alert and receiving the email notification
+- Tuned the alert query to focus on core Blob operations and significant authentication/service failures while reducing known portal/system noise
 
 ### Current Phase
-Azure Monitor, Log Analytics and operational observability.
+Backup and recovery.
+
+The Microsoft Entra ID, Azure RBAC, Storage and Azure Monitor/Log Analytics components have been implemented and validated. The project is now progressing to backup and recovery capabilities.
 
 > **Compute deployment note:** Azure Virtual Machine deployment was evaluated using free-services-eligible B-series SKUs. VM deployment is currently restricted by subscription-level regional/SKU availability. Compute implementation has therefore been deferred while the remaining infrastructure, security, monitoring and Infrastructure as Code components are developed.
 
@@ -253,6 +266,73 @@ This validation demonstrated:
 - Authentication-session and token refresh considerations following identity changes
 - The operational benefits of group-based access management
 
+## Monitoring and Logging
+
+Azure Monitor and Log Analytics provide operational visibility into the Azure environment.
+
+### Log Analytics Workspace
+
+| Component | Configuration |
+|---|---|
+| Workspace | law-azure-enterprise-dev |
+| Region | UK South |
+| Pricing Tier | Pay-as-you-go |
+| Retention | 31 days |
+| Daily ingestion cap | 0.1 GB/day |
+
+### Storage Diagnostic Logging
+
+A diagnostic setting named `diag-blob-to-law` was configured on the storage account to send the following Blob Storage categories to Log Analytics:
+
+- Storage Read
+- Storage Write
+- Storage Delete
+
+Logs are collected in the `StorageBlobLogs` table.
+
+### KQL Investigation
+
+KQL was used to investigate:
+
+- Blob read, write and delete operations
+- Microsoft Entra OAuth authentication
+- HTTP status codes and failed operations
+- Blob-specific activity using URI filtering
+- Operational activity associated with `enterprise-config.txt`
+
+A reusable query named `Enterprise Blob Operations Audit` was created to provide a focused view of Blob read, write and delete activity.
+
+### Alerting
+
+An Azure Monitor log-search alert named `alert-blob-failures-dev` was configured to identify significant Blob operation failures.
+
+The alert currently evaluates:
+
+- `GetBlob`
+- `PutBlob`
+- `DeleteBlob`
+- `ListBlobs`
+
+The alert focuses on HTTP 401, 403 and 500+ responses while excluding known `$blobchangefeed` noise.
+
+### Notification
+
+An Action Group named `ag-azure-enterprise-dev` was created with email notification delivery.
+
+The alert was successfully validated through an end-to-end test:
+
+1. Generated Blob Storage activity
+2. Confirmed telemetry in `StorageBlobLogs`
+3. Generated qualifying Blob failures
+4. Confirmed the Azure Monitor alert fired
+5. Confirmed the email notification was received
+
+The alert was subsequently tuned to reduce false positives while retaining meaningful failure detection.
+
+### Cost Control
+
+Monitoring was configured with a 30-minute aggregation and evaluation interval. Azure estimated the configured log-search alert at approximately $0.50 per month. Actual monitoring costs may vary based on data ingestion and other Azure Monitor usage.
+
 ## Planned Project Phases
 
 1. ✅ Architecture and requirements
@@ -263,7 +343,7 @@ This validation demonstrated:
 6. ⏸️ Compute deployment — deferred due to subscription-level VM availability
 7. ✅ Identity and RBAC
 8. ✅ Storage
-9. 🟡 Monitoring and logging — in progress
+9. ✅ Monitoring and logging
 10. ⬜ Backup and recovery
 11. ⬜ Infrastructure testing
 12. ⬜ Terraform Infrastructure as Code
