@@ -80,11 +80,23 @@ This project will progressively use:
 - Created the `ag-azure-enterprise-dev` Action Group with email notification delivery
 - Successfully validated the complete Azure Monitor alerting pipeline by generating Blob failures, confirming the events in Log Analytics, triggering the Azure Monitor alert and receiving the email notification
 - Tuned the alert query to focus on core Blob operations and significant authentication/service failures while reducing known portal/system noise
+- Created the `bv-azure-enterprise-dev` Azure Backup Vault in UK South using locally redundant backup storage
+- Enabled 14-day soft delete protection on the Backup Vault and configured a system-assigned managed identity
+- Created the `bp-blob-enterprise-dev` Azure Blob backup policy with 30-day operational backup retention
+- Configured daily vaulted Blob backups with 30-day retention to provide an isolated recovery copy outside the source storage account
+- Protected the `enterprise-data` container in `stazureenterprisedev` using Azure Backup
+- Assigned the required Azure RBAC permissions to the Backup Vault managed identity and successfully validated backup readiness
+- Successfully completed an on-demand vaulted backup and confirmed creation of a `Vault-standard` recovery point
+- Created `stazurerecoverydev` as a dedicated alternate recovery storage account in UK South
+- Successfully restored the protected `enterprise-data` container from the vaulted recovery point to `enterprise-data-restored` in the alternate storage account
+- Resolved restore-validation and post-recovery data-access issues using managed-identity permissions and `Storage Blob Data Contributor` data-plane RBAC
+- Verified the recovered `enterprise-config.txt` Blob in the alternate recovery storage account, completing an end-to-end backup and recovery test
 
 ### Current Phase
-Backup and recovery.
 
-The Microsoft Entra ID, Azure RBAC, Storage and Azure Monitor/Log Analytics components have been implemented and validated. The project is now progressing to backup and recovery capabilities.
+Compute implementation and infrastructure testing.
+
+The networking, Microsoft Entra ID, Azure RBAC, Storage, Azure Monitor/Log Analytics, alerting and Azure Backup components have now been implemented and validated. The project is progressing to Azure Virtual Machine deployment and integration with the existing network, monitoring, security and backup architecture.
 
 > **Compute deployment note:** Azure Virtual Machine deployment was evaluated using free-services-eligible B-series SKUs. VM deployment is currently restricted by subscription-level regional/SKU availability. Compute implementation has therefore been deferred while the remaining infrastructure, security, monitoring and Infrastructure as Code components are developed.
 
@@ -333,6 +345,88 @@ The alert was subsequently tuned to reduce false positives while retaining meani
 
 Monitoring was configured with a 30-minute aggregation and evaluation interval. Azure estimated the configured log-search alert at approximately $0.50 per month. Actual monitoring costs may vary based on data ingestion and other Azure Monitor usage.
 
+## Backup and Recovery
+
+Azure Backup was implemented to provide both operational recovery and an isolated vaulted recovery capability for business data stored in Azure Blob Storage.
+
+### Backup Architecture
+
+| Component | Configuration |
+|---|---|
+| Backup Vault | bv-azure-enterprise-dev |
+| Region | UK South |
+| Backup Storage Redundancy | Locally Redundant Storage (LRS) |
+| Vault Soft Delete | 14 days |
+| Managed Identity | System-assigned |
+| Backup Policy | bp-blob-enterprise-dev |
+| Protected Storage Account | stazureenterprisedev |
+| Protected Container | enterprise-data |
+| Operational Backup Retention | 30 days |
+| Vaulted Backup Frequency | Daily |
+| Vaulted Backup Retention | 30 days |
+
+### Protection Design
+
+The backup architecture uses two complementary recovery mechanisms.
+
+**Operational backup** provides continuous protection with a 30-day recovery window for rapid point-in-time recovery.
+
+**Vaulted backup** creates a separate recovery copy in `bv-azure-enterprise-dev`, providing recovery capability outside the source storage account. Vaulted backups are scheduled daily and retained for 30 days.
+
+The Backup Vault uses a system-assigned managed identity. Required Azure RBAC permissions were assigned to this identity during backup-readiness validation rather than using stored credentials.
+
+### Backup Validation
+
+An on-demand vaulted backup was triggered after protection was configured.
+
+The backup job completed successfully and created a full `Vault-standard` recovery point for the protected Blob container.
+
+This confirmed that:
+
+- The storage account was successfully registered for protection
+- Backup Vault managed-identity permissions were correctly configured
+- The Blob backup policy was operational
+- A recoverable vaulted copy of the protected data existed
+
+### Recovery Test
+
+A controlled restore test was performed using the vaulted recovery point.
+
+Azure Blob vaulted restore requires block blobs to be restored to an alternate storage account. A dedicated recovery account named `stazurerecoverydev` was therefore deployed in UK South using Standard LRS storage.
+
+The `enterprise-data` container was restored to:
+
+`stazurerecoverydev / enterprise-data-restored`
+
+The restored container was deliberately given a different name to distinguish recovered data from the original source.
+
+### Recovery Security
+
+The Backup Vault system-assigned managed identity was granted the permissions required to write restored data to the recovery storage account.
+
+After the restore, interactive access initially returned an HTTP 403 authorization error because management-plane access to the storage account did not automatically provide Blob data-plane access.
+
+`Storage Blob Data Contributor` was assigned for authenticated Blob access, after which the restored data became accessible.
+
+This demonstrated the separation between:
+
+- Azure resource management permissions
+- Blob data-plane RBAC permissions
+- Storage network controls
+- Azure Backup managed-identity permissions
+
+### Recovery Validation
+
+The restored `enterprise-data-restored` container was successfully accessed in the alternate recovery storage account.
+
+The recovered `enterprise-config.txt` block Blob was verified successfully, completing the end-to-end recovery test.
+
+The validated recovery path was:
+
+`stazureenterprisedev` → `enterprise-data` → Azure Backup → `bv-azure-enterprise-dev` → vaulted recovery point → `stazurerecoverydev` → `enterprise-data-restored` → `enterprise-config.txt`
+
+This test demonstrated that the environment can recover protected business data from an isolated vaulted backup without overwriting the original source data.
+
 ## Planned Project Phases
 
 1. ✅ Architecture and requirements
@@ -340,11 +434,11 @@ Monitoring was configured with a 30-minute aggregation and evaluation interval. 
 3. ✅ Resource organization
 4. ✅ Virtual network and subnet design
 5. ✅ Network security
-6. ⏸️ Compute deployment — deferred due to subscription-level VM availability
+6. 🔄 Compute deployment — implementation resumed
 7. ✅ Identity and RBAC
 8. ✅ Storage
 9. ✅ Monitoring and logging
-10. ⬜ Backup and recovery
+10. ✅ Backup and recovery
 11. ⬜ Infrastructure testing
 12. ⬜ Terraform Infrastructure as Code
 13. ⬜ Final architecture documentation
