@@ -94,11 +94,11 @@ This project will progressively use:
 
 ### Current Phase
 
+Compute implementation and infrastructure testing.
+
 > **Compute deployment note:** Azure Virtual Machine deployment was previously deferred due to subscription-level regional/SKU availability. Compute implementation has now resumed and will be integrated with the existing networking, security, monitoring and backup architecture.
 
 The networking, Microsoft Entra ID, Azure RBAC, Storage, Azure Monitor/Log Analytics, alerting and Azure Backup components have now been implemented and validated. The project is progressing to Azure Virtual Machine deployment and integration with the existing network, monitoring, security and backup architecture.
-
-> **Compute deployment note:** Azure Virtual Machine deployment was evaluated using free-services-eligible B-series SKUs. VM deployment is currently restricted by subscription-level regional/SKU availability. Compute implementation has therefore been deferred while the remaining infrastructure, security, monitoring and Infrastructure as Code components are developed.
 
 ## Resource Organisation
 
