@@ -456,3 +456,39 @@ Through this project I aim to develop and demonstrate practical capability in:
 - Automating infrastructure deployment
 - Using Terraform for Infrastructure as Code
 - Documenting technical architecture and engineering decisions
+
+
+Compute Infrastructure & Secure Private VM Deployment
+
+## Compute Infrastructure & Secure Private VM Deployment
+
+### Linux Virtual Machine Deployment
+### Private Network Integration
+### Managed Identity
+### Secure Administrative Access with Azure Bastion
+### Outbound Connectivity Troubleshooting
+### NAT Gateway Implementation & Validation
+
+VM: vm-app-linux-dev-01
+OS: Ubuntu Server 24.04 LTS
+Region: UK South
+Size: Standard_B2ls_v2
+vCPU: 2
+Memory: 4 GiB
+Authentication: SSH public key
+Public IP: None
+Private IP: 10.10.2.4
+VNet: vnet-enterprise-dev
+Subnet: snet-app
+
+#### Security & Management Configuration
+
+The Linux virtual machine was configured with the following security and management features:
+
+- **Trusted Launch:** Enabled
+- **Secure Boot:** Enabled
+- **vTPM:** Enabled
+- **OS Disk:** Standard SSD
+- **Auto-shutdown:** Enabled
+- **Periodic OS assessment:** Enabled
+- **System-assigned Managed Identity:** Enabled
