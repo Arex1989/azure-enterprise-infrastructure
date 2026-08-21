@@ -30,13 +30,11 @@ This project will progressively use:
 - Azure Virtual Network
 - Network Security Groups
 - Azure Virtual Machines
+- Azure Bastion
+- Azure NAT Gateway
+- Azure Network Watcher
 - Azure Storage
 - Azure Monitor
-- Log Analytics
-- Azure Backup
-- PowerShell
-- Terraform
-- Git and GitHub
 
 ## Project Status
 
@@ -91,14 +89,22 @@ This project will progressively use:
 - Successfully restored the protected `enterprise-data` container from the vaulted recovery point to `enterprise-data-restored` in the alternate storage account
 - Resolved restore-validation and post-recovery data-access issues using managed-identity permissions and `Storage Blob Data Contributor` data-plane RBAC
 - Verified the recovered `enterprise-config.txt` Blob in the alternate recovery storage account, completing an end-to-end backup and recovery test
+- Deployed `vm-app-linux-dev-01` as a private Ubuntu Server 24.04 LTS application-tier virtual machine in `snet-app`
+- Configured Trusted Launch, Secure Boot, vTPM, SSH public-key authentication and a system-assigned managed identity
+- Maintained a private VM architecture with no VM-level public IP address
+- Implemented secure administrative access to the private Linux VM using Azure Bastion
+- Used Azure Network Watcher Next Hop and IP Flow Verify to troubleshoot outbound connectivity and validate routing and NSG behaviour
+- Implemented `nat-app-dev` with static public IP `pip-nat-app-dev` to provide controlled outbound Internet connectivity for `snet-app`
+- Validated outbound HTTPS connectivity through the NAT Gateway with a successful HTTP/2 200 response
+- Validated Ubuntu repository connectivity and successful package-index retrieval from the private VM
 
 ### Current Phase
 
-Compute implementation and infrastructure testing.
+Compute deployment and private-network connectivity validation are complete.
 
-> **Compute deployment note:** Azure Virtual Machine deployment was previously deferred due to subscription-level regional/SKU availability. Compute implementation has now resumed and will be integrated with the existing networking, security, monitoring and backup architecture.
+The environment now includes validated networking, Microsoft Entra ID and Azure RBAC, secure Blob Storage, Azure Monitor and Log Analytics, alerting, Azure Backup and recovery, and a private Linux compute workload with secure Bastion administration and NAT Gateway outbound connectivity.
 
-The networking, Microsoft Entra ID, Azure RBAC, Storage, Azure Monitor/Log Analytics, alerting and Azure Backup components have now been implemented and validated. The project is progressing to Azure Virtual Machine deployment and integration with the existing network, monitoring, security and backup architecture.
+The next phase will expand infrastructure testing and operational validation before progressing to Terraform Infrastructure as Code.
 
 ## Resource Organisation
 
@@ -434,7 +440,7 @@ This test demonstrated that the environment can recover protected business data 
 3. ✅ Resource organization
 4. ✅ Virtual network and subnet design
 5. ✅ Network security
-6. 🔄 Compute deployment — implementation resumed
+6. ✅ Compute deployment
 7. ✅ Identity and RBAC
 8. ✅ Storage
 9. ✅ Monitoring and logging
@@ -458,37 +464,234 @@ Through this project I aim to develop and demonstrate practical capability in:
 - Documenting technical architecture and engineering decisions
 
 
-Compute Infrastructure & Secure Private VM Deployment
-
 ## Compute Infrastructure & Secure Private VM Deployment
 
 ### Linux Virtual Machine Deployment
-### Private Network Integration
-### Managed Identity
-### Secure Administrative Access with Azure Bastion
-### Outbound Connectivity Troubleshooting
-### NAT Gateway Implementation & Validation
 
-VM: vm-app-linux-dev-01
-OS: Ubuntu Server 24.04 LTS
-Region: UK South
-Size: Standard_B2ls_v2
-vCPU: 2
-Memory: 4 GiB
-Authentication: SSH public key
-Public IP: None
-Private IP: 10.10.2.4
-VNet: vnet-enterprise-dev
-Subnet: snet-app
+The compute phase of the project introduced a private Linux virtual machine into the existing enterprise network architecture. The VM was designed to operate as an application-tier workload while maintaining a private network posture and avoiding direct exposure to the public Internet.
+
+#### VM Configuration
+
+| Configuration | Value |
+|---|---|
+| Virtual Machine | `vm-app-linux-dev-01` |
+| Operating System | Ubuntu Server 24.04 LTS |
+| Region | UK South |
+| VM Size | `Standard_B2ls_v2` |
+| vCPUs | 2 |
+| Memory | 4 GiB |
+| Architecture | x64 |
+| Authentication | SSH Public Key |
+| Private IP | `10.10.2.4` |
+| Public IP | None |
+| Virtual Network | `vnet-enterprise-dev` |
+| Subnet | `snet-app (10.10.2.0/24)` |
+| OS Disk | Standard SSD |
+| Security Type | Trusted Launch |
 
 #### Security & Management Configuration
 
-The Linux virtual machine was configured with the following security and management features:
+The Linux virtual machine was configured with additional security, identity, maintenance, and cost-management controls:
 
 - **Trusted Launch:** Enabled
 - **Secure Boot:** Enabled
 - **vTPM:** Enabled
-- **OS Disk:** Standard SSD
+- **Standard SSD managed OS disk:** Enabled
 - **Auto-shutdown:** Enabled
 - **Periodic OS assessment:** Enabled
 - **System-assigned Managed Identity:** Enabled
+- **Direct public IP assignment:** Disabled
+
+The VM was intentionally deployed without a public IP address to reduce its Internet-facing attack surface.
+
+![Azure VM Overview](screenshots/compute/vm-overview.png)
+
+---
+
+### Private Network Integration
+
+The Linux VM was integrated into the existing application subnet:
+
+- **Virtual Network:** `vnet-enterprise-dev`
+- **Application Subnet:** `snet-app`
+- **Address Range:** `10.10.2.0/24`
+- **VM Private IP:** `10.10.2.4`
+- **Network Security Group:** `nsg-app-dev`
+- **VM Public IP:** None
+
+This design keeps the application workload private while network security is enforced through the NSG associated with the application subnet.
+
+The resulting network placement is:
+
+```text
+vnet-enterprise-dev
+        |
+        +-- snet-web        10.10.1.0/24
+        |
+        +-- snet-app        10.10.2.0/24
+        |       |
+        |       +-- vm-app-linux-dev-01
+        |             Private IP: 10.10.2.4
+        |             Public IP: None
+        |
+        +-- snet-management 10.10.3.0/24
+```
+
+![Private VM Networking](screenshots/compute/vm-private-networking.png)
+
+---
+
+### Managed Identity
+
+A system-assigned managed identity was enabled for `vm-app-linux-dev-01`.
+
+This registers the virtual machine with Microsoft Entra ID and provides the VM with its own identity that can be used to authenticate to supported Azure services without storing usernames, passwords, access keys or other credentials directly on the virtual machine.
+
+The managed identity is tied to the lifecycle of the VM and can be granted Azure RBAC permissions when access to other Azure resources is required.
+
+This configuration establishes the foundation for identity-based service-to-service authentication and supports the project's broader least-privilege security model.
+
+---
+
+### Secure Administrative Access with Azure Bastion
+
+Because the Linux virtual machine was intentionally deployed without a public IP address, direct SSH access from the public Internet was not enabled.
+
+Azure Bastion was used to establish secure administrative access to the private VM through the Azure portal.
+
+The connection used:
+
+- **Virtual Machine:** `vm-app-linux-dev-01`
+- **Username:** `azureuser`
+- **Authentication:** SSH private key
+- **VM Public IP:** None
+- **VM Private IP:** `10.10.2.4`
+- **Access Method:** Azure Bastion
+
+This allowed an authenticated SSH session to be established without exposing TCP port 22 directly to the public Internet.
+
+Successful access to the Ubuntu 24.04 LTS shell confirmed that the VM was operational and administratively accessible through the private network architecture.
+
+![Secure Azure Bastion Access](screenshots/compute/bastion-private-vm-access.png)
+
+---
+
+### Outbound Connectivity Troubleshooting
+
+After deployment, the private Linux VM was accessible through Azure Bastion but outbound HTTPS connectivity from the VM was unsuccessful.
+
+Initial testing showed that DNS resolution was functioning and the VM had a valid default route. However, HTTPS requests to external Internet services timed out.
+
+Azure Network Watcher was used to investigate the network path.
+
+#### Next Hop Validation
+
+A Next Hop test was performed from the VM's network interface using `8.8.8.8` as the destination.
+
+The result returned:
+
+- **Next hop type:** Internet
+- **Route:** System Route
+
+This confirmed that Azure routing recognised the Internet as the appropriate next hop for outbound traffic.
+
+![Network Watcher Next Hop](screenshots/compute/network-watcher-next-hop.png)
+
+#### NSG Outbound Validation
+
+IP Flow Verify was then used to determine whether the Network Security Group was blocking outbound HTTPS traffic.
+
+The test confirmed:
+
+- **Direction:** Outbound
+- **Protocol:** TCP
+- **Destination Port:** 443
+- **Result:** Access allowed
+- **Security Rule:** `AllowInternetOutBound`
+
+This demonstrated that `nsg-app-dev` was not responsible for the connectivity failure.
+
+![Network Watcher IP Flow Verify](screenshots/compute/network-watcher-ip-flow.png)
+
+The combined troubleshooting results demonstrated that both Azure routing and NSG policy permitted outbound connectivity. The remaining issue was therefore associated with providing explicit outbound Internet connectivity for the private application subnet.
+
+---
+
+### NAT Gateway Implementation
+
+An Azure NAT Gateway was implemented to provide controlled outbound Internet connectivity for workloads hosted in the private `snet-app` subnet.
+
+The NAT Gateway was configured as follows:
+
+| Configuration | Value |
+|---|---|
+| NAT Gateway | `nat-app-dev` |
+| Region | UK South |
+| SKU | Standard |
+| Public IP | `pip-nat-app-dev` |
+| Public IP Assignment | Static |
+| Virtual Network | `vnet-enterprise-dev` |
+| Associated Subnet | `snet-app (10.10.2.0/24)` |
+| TCP Idle Timeout | 4 minutes |
+
+The NAT Gateway was associated at subnet level rather than assigning a public IP directly to the VM.
+
+This preserves the VM's private network posture while providing explicit outbound Internet connectivity through a controlled Azure networking resource.
+
+![NAT Gateway Configuration](screenshots/compute/nat-gateway-configuration.png)
+
+---
+
+### Outbound Connectivity Validation
+
+After associating the NAT Gateway with `snet-app`, outbound connectivity tests were repeated from `vm-app-linux-dev-01`.
+
+#### HTTPS Validation
+
+An HTTPS request to an external Internet endpoint completed successfully and returned:
+
+`HTTP/2 200`
+
+This confirmed successful outbound TCP/443 connectivity from the private VM through the NAT Gateway.
+
+![Successful HTTPS Validation](screenshots/compute/nat-https-validation.png)
+
+#### Ubuntu Repository Validation
+
+Package repository connectivity was also tested using Ubuntu's package management service.
+
+The VM successfully contacted `azure.archive.ubuntu.com`, downloaded repository metadata and refreshed the package index.
+
+The validation downloaded approximately **36.7 MB** of repository information and identified available package upgrades.
+
+![Successful Ubuntu Repository Update](screenshots/compute/nat-apt-update-validation.png)
+
+The completed connectivity path is therefore:
+
+`vm-app-linux-dev-01` → `snet-app` → `nat-app-dev` → `pip-nat-app-dev` → Internet
+
+This implementation demonstrates a secure cloud networking pattern in which a workload can remain privately addressed while retaining controlled outbound access required for operating-system updates, package retrieval and external service communication.
+
+---
+
+### Compute Phase Validation
+
+The compute implementation successfully demonstrated:
+
+- Deployment of an Ubuntu Linux workload in Azure
+- Integration with an existing segmented virtual network
+- Private addressing without a VM-level public IP
+- Subnet-level Network Security Group protection
+- Trusted Launch, Secure Boot and vTPM
+- SSH public-key authentication
+- System-assigned managed identity
+- Secure administrative access using Azure Bastion
+- Azure Network Watcher troubleshooting
+- Next Hop route validation
+- NSG IP Flow verification
+- NAT Gateway implementation
+- Controlled outbound Internet connectivity
+- Successful HTTPS connectivity
+- Successful Ubuntu repository access
+- Automated VM shutdown for cost management
+
