@@ -695,3 +695,44 @@ The compute implementation successfully demonstrated:
 - Successful Ubuntu repository access
 - Automated VM shutdown for cost management
 
+
+---
+
+## Azure VM Monitoring and Operational Visibility
+
+Monitoring was configured and validated for `vm-app-linux-dev-01` to provide operational visibility into workload health, availability and resource utilization.
+
+Azure Monitor was used to validate the operational state of the VM and collect platform and guest-level telemetry.
+
+### Monitoring Validation
+
+The monitoring implementation demonstrated:
+
+- VM availability and health monitoring
+- Azure platform metrics collection
+- CPU utilization monitoring
+- Guest operating system monitoring
+- Memory utilization visibility
+- Process-level performance visibility
+- Azure Monitor Linux Agent integration
+- Operational health and availability validation
+
+The VM remained available during validation with no active Azure outage or health event affecting the workload.
+
+### VM Health Overview
+
+![Azure VM Health and Monitoring Overview](screenshots/monitoring/vm-monitor-health-overview.png)
+
+### CPU Metrics
+
+Azure Monitor platform metrics were used to validate CPU utilization for the Linux workload.
+
+![Azure VM CPU Metrics](screenshots/monitoring/vm-cpu-metrics.png)
+
+### Guest-Level Monitoring
+
+Guest monitoring provided additional visibility into memory utilization and operating-system processes running inside the Linux VM.
+
+![Azure VM Guest Monitoring](screenshots/monitoring/vm-guest-monitoring.png)
+
+This monitoring configuration demonstrates the operational visibility required to support and troubleshoot cloud-hosted workloads in an enterprise Azure environment.
