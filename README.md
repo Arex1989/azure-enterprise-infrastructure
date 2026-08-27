@@ -736,3 +736,47 @@ Guest monitoring provided additional visibility into memory utilization and oper
 ![Azure VM Guest Monitoring](screenshots/monitoring/vm-guest-monitoring.png)
 
 This monitoring configuration demonstrates the operational visibility required to support and troubleshoot cloud-hosted workloads in an enterprise Azure environment.
+
+
+---
+
+## Azure VM Backup and Recovery
+
+Backup and recovery were configured for `vm-app-linux-dev-01` to provide workload protection and recovery capability for the Linux virtual machine.
+
+Azure Backup was implemented using a Recovery Services vault and an enhanced backup policy. The configuration provides scheduled protection of the VM and maintains recovery points that can be used to restore the workload following data loss, corruption or operational failure.
+
+### Backup Configuration
+
+The backup implementation demonstrated:
+
+- Azure VM backup protection
+- Recovery Services vault integration
+- Enhanced backup policy configuration
+- Scheduled VM backup
+- Successful backup pre-check validation
+- Protection of all VM disks
+- Successful backup job execution
+- Creation of a recoverable restore point
+- File-system consistent recovery point
+- Operational verification of backup status
+
+### Successful Backup Status
+
+The VM backup configuration was successfully enabled and Azure reported the most recent backup operation as successful.
+
+![Azure VM Backup Status](screenshots/backup/vm-backup-status-success.png)
+
+### Recovery Point Validation
+
+A file-system consistent recovery point was successfully created for the Linux VM, demonstrating that the protected workload can be recovered from the Azure Backup service.
+
+![Azure VM Recovery Point](screenshots/backup/vm-backup-recovery-point.png)
+
+### Backup Job Validation
+
+Azure Backup job history confirmed successful completion of both the backup configuration and VM backup operations.
+
+![Azure VM Backup Job Completed](screenshots/backup/vm-backup-job-completed.png)
+
+This backup implementation demonstrates a fundamental enterprise workload protection pattern by combining scheduled backup, centralized recovery services and validated recovery points for an Azure virtual machine.
