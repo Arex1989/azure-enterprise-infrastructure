@@ -843,3 +843,50 @@ Additional network-hardening validation confirmed that the workload remained pro
 ![Network Hardening Validation](screenshots/security/test-9d-network-hardening-validation-part2.png)
 
 This security implementation demonstrates an enterprise Azure security pattern combining Trusted Launch, managed identities, RBAC, least-privilege authorization, Defender for Cloud and network-level protection.
+
+
+---
+
+## Azure VM Update Management and Patch Compliance
+
+Update management was configured and validated for `vm-app-linux-dev-01` to demonstrate operational patching and update compliance for the Linux workload.
+
+Azure Update Manager was used to assess available updates, perform patch installation and verify the VM's compliance state after remediation.
+
+### Update Management Validation
+
+The update-management implementation demonstrated:
+
+- Periodic update assessment
+- Identification of available Linux package updates
+- Manual patch deployment
+- Successful installation of available updates
+- Post-patching reassessment
+- Verification of update compliance
+- Operational patch history and deployment tracking
+
+### Pre-Patching Assessment
+
+An update assessment was performed before remediation to identify packages requiring updates on the Linux virtual machine.
+
+![Azure VM Update Assessment Before Patching](screenshots/updates/update-assessment-before-patching.png)
+
+### Update Installation
+
+Available updates were deployed through Azure Update Manager. The update operation completed successfully, demonstrating centralized patch execution for the Linux workload.
+
+![Azure VM Update Installation Success](screenshots/updates/update-installation-success.png)
+
+### Update Assessment Validation
+
+Following patch installation, another assessment was successfully completed to validate the current update state of the virtual machine.
+
+![Azure VM Update Assessment Success](screenshots/updates/update-assessment-success.png)
+
+### Patch Compliance
+
+The post-patching assessment reported no remaining updates, confirming that the virtual machine was compliant with the updates identified during the assessment cycle.
+
+![Azure VM Update Assessment Compliant](screenshots/updates/update-assessment-compliant.png)
+
+This implementation demonstrates an operational Azure patch-management workflow combining update assessment, controlled remediation, deployment tracking and post-patching compliance validation.
