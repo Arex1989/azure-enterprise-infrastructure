@@ -780,3 +780,66 @@ Azure Backup job history confirmed successful completion of both the backup conf
 ![Azure VM Backup Job Completed](screenshots/backup/vm-backup-job-completed.png)
 
 This backup implementation demonstrates a fundamental enterprise workload protection pattern by combining scheduled backup, centralized recovery services and validated recovery points for an Azure virtual machine.
+
+
+---
+
+## Azure VM Security, Identity and Least-Privilege Access
+
+Security controls were implemented and validated for `vm-app-linux-dev-01` using Azure platform security, Microsoft Entra ID managed identities and Azure role-based access control (RBAC).
+
+The implementation follows a defense-in-depth and least-privilege approach, combining workload security, identity-based authentication, network controls and scoped authorization.
+
+### Security Controls
+
+The security implementation demonstrated:
+
+- Trusted Launch virtual machine security
+- Secure Boot and virtual TPM (vTPM)
+- Microsoft Defender for Cloud security assessment
+- System-assigned managed identity
+- Microsoft Entra ID workload identity
+- Azure role-based access control (RBAC)
+- Least-privilege access to Azure Storage
+- Network Security Group inbound traffic control
+- Network hardening validation
+
+### Trusted Launch Security
+
+The Linux VM was deployed using Azure Trusted Launch with Secure Boot and vTPM enabled, providing additional protection for the virtual machine boot process and platform integrity.
+
+![Azure VM Trusted Launch Security](screenshots/security/test-9e-trusted-launch-security.png)
+
+### Microsoft Defender for Cloud
+
+Microsoft Defender for Cloud was used to review the security posture of the Azure workload and provide security recommendations and assessment visibility.
+
+![Microsoft Defender for Cloud Security Assessment](screenshots/security/defender-cloud-security-assessment.png)
+
+### System-Assigned Managed Identity
+
+A system-assigned managed identity was enabled for the Linux VM, allowing the workload to authenticate to supported Azure services through Microsoft Entra ID without storing credentials directly within the virtual machine.
+
+![Azure VM System-Assigned Managed Identity](screenshots/security/vm-system-assigned-managed-identity.png)
+
+### RBAC and Least-Privilege Access
+
+Azure RBAC was used to provide scoped access to Azure Storage. The implementation validated assignment of the Storage Blob Data Reader role rather than granting broader administrative permissions.
+
+![Storage Blob Data Reader RBAC Assignment](screenshots/security/rbac-storage-blob-reader-assignment-success.png)
+
+Least-privilege access was subsequently validated to confirm that the identity operated with the intended scoped permissions.
+
+![Least-Privilege RBAC Validation](screenshots/security/test-9d-least-privilege-rbac-verified.png)
+
+### Network Security Validation
+
+Network Security Group controls were used to restrict inbound connectivity to the workload and reduce unnecessary network exposure.
+
+![NSG Inbound Security Validation](screenshots/security/test-9d-network-security-inbound.png)
+
+Additional network-hardening validation confirmed that the workload remained protected while retaining the connectivity required for normal operation.
+
+![Network Hardening Validation](screenshots/security/test-9d-network-hardening-validation-part2.png)
+
+This security implementation demonstrates an enterprise Azure security pattern combining Trusted Launch, managed identities, RBAC, least-privilege authorization, Defender for Cloud and network-level protection.
