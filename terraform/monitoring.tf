@@ -19,3 +19,24 @@ resource "azurerm_log_analytics_workspace" "main" {
     Purpose     = "CloudEngineeringPortfolio"
   }
 }
+
+
+resource "azurerm_monitor_action_group" "main" {
+  name                = "ag-azure-enterprise-dev"
+  resource_group_name = azurerm_resource_group.main.name
+  short_name          = "AzureEntDev"
+  enabled             = true
+
+  email_receiver {
+    name                    = "Email-CloudOps_-EmailAction-"
+    email_address           = "rexmond.anih@yahoo.com"
+    use_common_alert_schema = false
+  }
+
+  tags = {
+    Environment = "Development"
+    ManagedBy   = "Manual"
+    Project     = "AzureEnterpriseLab"
+    Purpose     = "CloudEngineeringPortfolio"
+  }
+}
