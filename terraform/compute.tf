@@ -1,3 +1,13 @@
+resource "azurerm_ssh_public_key" "app_vm" {
+  name                = "ssh-vm-app-linux-dev-01"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+
+  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICKV+ga5l0CrMaHld0DuVQj7HJZ81w3Z6OkVzX8wQhMZ generated-by-azure"
+
+}
+
+
 resource "azurerm_network_interface" "app_vm" {
   name                = "vm-app-linux-dev-01843"
   location            = azurerm_resource_group.main.location
