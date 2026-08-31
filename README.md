@@ -445,8 +445,9 @@ This test demonstrated that the environment can recover protected business data 
 8. ✅ Storage
 9. ✅ Monitoring and logging
 10. ✅ Backup and recovery
-11. ⬜ Infrastructure testing
-12. ⬜ Terraform Infrastructure as Code
+11. ✅ Infrastructure testing
+    - [View Infrastructure Testing Results](docs/infrastructure-testing.md)
+12. 🚧 Terraform Infrastructure as Code
 13. ⬜ Final architecture documentation
 
 ## Learning Objectives
