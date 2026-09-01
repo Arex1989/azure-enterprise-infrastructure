@@ -117,3 +117,15 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "blob_failures" {
     ]
   }
 }
+
+resource "azurerm_monitor_action_group" "vmi_vm" {
+  name                = "VMI-ActionGroup-vm-app-linux-dev-01"
+  resource_group_name = azurerm_resource_group.main.name
+  short_name          = "VMI-vm-app-l"
+
+  email_receiver {
+    name                    = "Email-rexmond.anih@gmail.com"
+    email_address           = "rexmond.anih@gmail.com"
+    use_common_alert_schema = true
+  }
+}
