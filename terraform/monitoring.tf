@@ -129,3 +129,28 @@ resource "azurerm_monitor_action_group" "vmi_vm" {
     use_common_alert_schema = true
   }
 }
+
+resource "azurerm_monitor_metric_alert" "vm_availability" {
+  name                = "VM Availability - vm-app-linux-dev-01"
+  resource_group_name = azurerm_resource_group.main.name
+  scopes              = [lower(azurerm_linux_virtual_machine.app_vm.id)]
+
+  description   = "VM is unavailable or not responding"
+  severity      = 3
+  enabled       = true
+  frequency     = "PT5M"
+  window_size   = "PT5M"
+  auto_mitigate = false
+
+  criteria {
+    metric_namespace = "Microsoft.Compute/virtualMachines"
+    metric_name      = "VmAvailabilityMetric"
+    aggregation      = "Average"
+    operator         = "LessThan"
+    threshold        = 1
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.vmi_vm.id
+  }
+}
