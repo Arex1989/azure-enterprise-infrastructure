@@ -447,8 +447,70 @@ This test demonstrated that the environment can recover protected business data 
 10. ✅ Backup and recovery
 11. ✅ Infrastructure testing
     - [View Infrastructure Testing Results](docs/infrastructure-testing.md)
-12. 🚧 Terraform Infrastructure as Code
+12. ✅ Terraform Infrastructure as Code
 13. ⬜ Final architecture documentation
+
+
+
+## Phase 12 — Terraform Infrastructure as Code
+
+The existing Azure enterprise environment was brought under Terraform management using an adoption-first Infrastructure as Code approach. Existing Azure resources were inspected, represented in Terraform, imported into Terraform state, and reconciled without unnecessary resource recreation.
+
+### Infrastructure Managed with Terraform
+
+- Azure Resource Group
+- Virtual Network and application, web, and management subnets
+- Network Security Groups and subnet associations
+- HTTPS network security rules
+- NAT Gateway and Public IP
+- Linux application virtual machine
+- Network Interface
+- SSH public key
+- Azure Bastion
+- Primary and recovery Storage Accounts
+- Log Analytics Workspace
+- Azure Monitor Action Groups
+- Azure Monitor Linux Agent
+- Data Collection Rule
+- VM Availability metric alert
+- Blob storage failure alert
+- Azure Data Protection Backup Vault
+- Recovery Services Vault
+- VM automatic shutdown schedule
+
+### Terraform Adoption Workflow
+
+Existing Azure resources were incorporated into Terraform using a controlled workflow:
+
+1. Inspect the deployed Azure resource and configuration.
+2. Define the equivalent Terraform resource.
+3. Run `terraform fmt` and `terraform validate`.
+4. Import the existing Azure resource into Terraform state.
+5. Run `terraform plan` to identify configuration drift.
+6. Reconcile Terraform configuration with the existing Azure environment.
+7. Repeat until Terraform reports no infrastructure differences.
+
+
+### Final Validation
+
+Phase 12 concluded with:
+
+```text
+Success! The configuration is valid.
+```
+
+and:
+
+```text
+No changes. Your infrastructure matches the configuration.
+```
+
+The Terraform state was also compared against the Azure resource inventory to verify infrastructure coverage. Azure-managed child resources, such as the Linux VM OS disk, remain lifecycle-managed through their parent Terraform resources rather than being unnecessarily imported separately.
+
+This demonstrates practical experience with Terraform state management, brownfield infrastructure adoption, Azure resource imports, drift reconciliation, dependency management, and Infrastructure as Code.
+
+
+
 
 ## Learning Objectives
 
