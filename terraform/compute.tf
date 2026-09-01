@@ -95,3 +95,25 @@ resource "azurerm_linux_virtual_machine" "app_vm" {
 
 }
 
+resource "azurerm_dev_test_global_vm_shutdown_schedule" "app_vm" {
+  virtual_machine_id = azurerm_linux_virtual_machine.app_vm.id
+  location           = azurerm_resource_group.main.location
+  enabled            = true
+
+  daily_recurrence_time = "2330"
+  timezone              = "GMT Standard Time"
+
+  notification_settings {
+    enabled         = true
+    time_in_minutes = 30
+    email           = "rexmond.anih@gmail.com"
+  }
+
+  tags = {
+    Environment = "Development"
+    ManagedBy   = "Manual"
+    Project     = "AzureEnterpriseLab"
+    Purpose     = "CloudEngineeringPortfolio"
+    Workload    = "ApplicationCompute"
+  }
+}
