@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1120" viewBox="0 0 1800 1120">
+<defs>
+  <style>
+    .title{font:700 34px Arial,Helvetica,sans-serif;fill:#17365d}.subtitle{font:400 18px Arial,Helvetica,sans-serif;fill:#526579}
+    .h{font:700 20px Arial,Helvetica,sans-serif;fill:#17365d}.sh{font:700 16px Arial,Helvetica,sans-serif;fill:#17365d}
+    .t{font:400 14px Arial,Helvetica,sans-serif;fill:#243746}.small{font:400 12px Arial,Helvetica,sans-serif;fill:#425466}
+    .tiny{font:400 11px Arial,Helvetica,sans-serif;fill:#425466}.mono{font:600 12px Menlo,Consolas,monospace;fill:#17365d}
+    .box{fill:#fff;stroke:#7797bb;stroke-width:2}.zone{fill:#f7fbff;stroke:#4d8bc7;stroke-width:2}.subnet{fill:#fff;stroke:#6fa3d8;stroke-width:2}
+    .panel{fill:#fbfcfe;stroke:#5c7fa6;stroke-width:2}.green{fill:#f5fbf6;stroke:#4d9863;stroke-width:2}.purple{fill:#faf7ff;stroke:#8163b5;stroke-width:2}.orange{fill:#fff9f1;stroke:#c77a18;stroke-width:2}
+    .arrow{stroke:#315b82;stroke-width:2.5;fill:none;marker-end:url(#m)} .dash{stroke-dasharray:8 6}
+    .label{fill:#fff;stroke:#c4d2df;stroke-width:1}.pill{fill:#eaf2fb;stroke:#8fb0cf;stroke-width:1}
+  </style>
+  <marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L9,3 L0,6 Z" fill="#315b82"/></marker>
+</defs>
+<rect width="1800" height="1120" fill="#ffffff"/>
+<text x="900" y="45" text-anchor="middle" class="title">Azure Enterprise Infrastructure Architecture</text>
+<text x="900" y="74" text-anchor="middle" class="subtitle">Secure • Observable • Recoverable • Infrastructure as Code</text>
+
+<!-- Management / IaC -->
+<rect x="30" y="105" width="330" height="300" rx="14" class="purple"/>
+<text x="195" y="135" text-anchor="middle" class="h">Management / IaC</text>
+<text x="70" y="170" class="sh">GitHub Repository</text><text x="70" y="193" class="small">Terraform configuration</text>
+<rect x="70" y="215" width="250" height="44" rx="8" class="pill"/><text x="195" y="243" text-anchor="middle" class="mono">terraform fmt / validate / plan</text>
+<text x="70" y="288" class="sh">Brownfield adoption</text>
+<text x="70" y="311" class="small">Inspect → define → import → plan</text>
+<text x="70" y="332" class="small">reconcile → repeat until no drift</text>
+<text x="70" y="368" class="sh">Source control</text><text x="70" y="389" class="small">Git commit + push to main</text>
+
+<!-- Azure boundary -->
+<rect x="390" y="105" width="1050" height="690" rx="16" class="zone"/>
+<text x="420" y="140" class="h">Microsoft Azure</text><text x="1405" y="140" text-anchor="end" class="sh">Region: UK South</text>
+<rect x="420" y="165" width="990" height="595" rx="14" class="panel"/>
+<text x="450" y="200" class="sh">Resource Group</text><text x="570" y="200" class="mono">rg-azure-enterprise-dev</text>
+
+<!-- VNet -->
+<rect x="455" y="225" width="900" height="390" rx="14" class="green"/>
+<text x="485" y="258" class="h">Virtual Network</text><text x="700" y="258" class="mono">vnet-enterprise-dev</text><text x="980" y="258" class="small">10.10.0.0/16</text>
+
+<!-- web subnet -->
+<rect x="480" y="285" width="255" height="285" rx="12" class="subnet"/>
+<text x="500" y="315" class="sh">Web Subnet</text><text x="500" y="336" class="mono">10.10.1.0/24</text>
+<text x="500" y="365" class="small">NSG: nsg-web-dev</text>
+<rect x="500" y="390" width="215" height="75" rx="8" class="box"/>
+<text x="607" y="420" text-anchor="middle" class="sh">HTTPS rule</text><text x="607" y="442" text-anchor="middle" class="small">TCP 443</text>
+<text x="500" y="500" class="tiny">Future web-tier capacity</text>
+
+<!-- app subnet -->
+<rect x="770" y="285" width="300" height="285" rx="12" class="subnet"/>
+<text x="790" y="315" class="sh">Application Subnet</text><text x="790" y="336" class="mono">10.10.2.0/24</text>
+<text x="790" y="365" class="small">NSG: nsg-app-dev</text>
+<rect x="790" y="390" width="260" height="105" rx="8" class="box"/>
+<text x="920" y="418" text-anchor="middle" class="sh">Linux Application VM</text>
+<text x="920" y="441" text-anchor="middle" class="mono">vm-app-linux-dev-01</text>
+<text x="920" y="463" text-anchor="middle" class="small">Private IP • SSH key auth</text>
+<rect x="810" y="510" width="220" height="40" rx="8" class="pill"/>
+<text x="920" y="535" text-anchor="middle" class="mono">NIC: vm-app-linux-dev-01843</text>
+
+<!-- management subnet -->
+<rect x="1100" y="285" width="225" height="285" rx="12" class="subnet"/>
+<text x="1120" y="315" class="sh">Management Subnet</text><text x="1120" y="336" class="mono">10.10.3.0/24</text>
+<text x="1120" y="365" class="small">NSG: nsg-management</text>
+<rect x="1120" y="395" width="185" height="105" rx="8" class="box"/>
+<text x="1212" y="425" text-anchor="middle" class="sh">Azure Bastion</text>
+<text x="1212" y="448" text-anchor="middle" class="small">vnet-enterprise-dev-bastion</text>
+<text x="1212" y="470" text-anchor="middle" class="small">Secure administrative access</text>
+
+<!-- intra arrows -->
+<path d="M735 430 L770 430" class="arrow"/>
+<path d="M1070 430 L1100 430" class="arrow"/>
+
+<!-- NAT -->
+<rect x="480" y="635" width="260" height="95" rx="12" class="box"/>
+<text x="610" y="666" text-anchor="middle" class="sh">NAT Gateway</text><text x="610" y="688" text-anchor="middle" class="mono">nat-app-dev</text><text x="610" y="710" text-anchor="middle" class="small">Outbound Internet only</text>
+<rect x="775" y="635" width="250" height="95" rx="12" class="box"/>
+<text x="900" y="666" text-anchor="middle" class="sh">Public IP</text><text x="900" y="688" text-anchor="middle" class="mono">pip-nat-app-dev</text><text x="900" y="710" text-anchor="middle" class="small">Attached to NAT Gateway</text>
+<path d="M640 570 L640 635" class="arrow"/><path d="M740 682 L775 682" class="arrow"/>
+
+<!-- security panel -->
+<rect x="1050" y="635" width="300" height="95" rx="12" class="box"/>
+<text x="1200" y="664" text-anchor="middle" class="sh">Security Baseline</text>
+<text x="1075" y="688" class="tiny">Network segmentation • NSGs • Private VM</text>
+<text x="1075" y="706" class="tiny">SSH keys • TLS 1.2+ • RBAC • Bastion</text>
+
+<!-- Storage layer -->
+<rect x="1470" y="105" width="300" height="360" rx="14" class="orange"/>
+<text x="1620" y="135" text-anchor="middle" class="h">Storage Layer</text>
+<rect x="1490" y="160" width="260" height="120" rx="10" class="box"/>
+<text x="1510" y="188" class="sh">Primary Storage</text><text x="1510" y="210" class="mono">stazureenterprisedev</text>
+<text x="1510" y="235" class="tiny">StorageV2 • TLS 1.2+ • HTTPS</text><text x="1510" y="253" class="tiny">Versioning • soft delete • change feed</text><text x="1510" y="271" class="tiny">Point-in-time restore • network rules</text>
+<rect x="1490" y="300" width="260" height="120" rx="10" class="box"/>
+<text x="1510" y="328" class="sh">Recovery Storage</text><text x="1510" y="350" class="mono">stazurerecoverydev</text>
+<text x="1510" y="375" class="tiny">StorageV2 • LRS • TLS 1.2+</text><text x="1510" y="393" class="tiny">Public access disabled • network rules</text><text x="1510" y="411" class="tiny">Terraform-managed</text>
+
+<!-- Monitoring -->
+<rect x="390" y="820" width="1380" height="150" rx="14" class="panel"/>
+<text x="420" y="852" class="h">Monitoring &amp; Alerting</text>
+<rect x="420" y="875" width="220" height="65" rx="9" class="box"/><text x="530" y="902" text-anchor="middle" class="sh">Linux VM</text><text x="530" y="923" text-anchor="middle" class="small">Azure Monitor Linux Agent</text>
+<rect x="700" y="875" width="220" height="65" rx="9" class="box"/><text x="810" y="902" text-anchor="middle" class="sh">Data Collection Rule</text><text x="810" y="923" text-anchor="middle" class="small">msvmi-uksouth-vm-app-linux-dev-01</text>
+<rect x="980" y="875" width="235" height="65" rx="9" class="box"/><text x="1097" y="902" text-anchor="middle" class="sh">Log Analytics</text><text x="1097" y="923" text-anchor="middle" class="mono">law-azure-enterprise-dev</text>
+<rect x="1275" y="875" width="190" height="65" rx="9" class="box"/><text x="1370" y="902" text-anchor="middle" class="sh">Metric Alert</text><text x="1370" y="923" text-anchor="middle" class="small">VM Availability</text>
+<rect x="1515" y="875" width="225" height="65" rx="9" class="box"/><text x="1627" y="902" text-anchor="middle" class="sh">Action Group</text><text x="1627" y="923" text-anchor="middle" class="small">Email notification</text>
+<path d="M640 907 L700 907" class="arrow"/><path d="M920 907 L980 907" class="arrow"/><path d="M1215 907 L1275 907" class="arrow"/><path d="M1465 907 L1515 907" class="arrow"/>
+<text x="1280" y="860" class="tiny">Also: scheduled query alert for blob failures</text>
+
+<!-- Backup -->
+<rect x="1470" y="490" width="300" height="270" rx="14" class="purple"/>
+<text x="1620" y="520" text-anchor="middle" class="h">Backup &amp; Recovery</text>
+<rect x="1490" y="545" width="260" height="80" rx="10" class="box"/><text x="1510" y="573" class="sh">Backup Vault</text><text x="1510" y="596" class="mono">bv-azure-enterprise-dev</text><text x="1510" y="616" class="tiny">Azure Data Protection • soft delete</text>
+<rect x="1490" y="645" width="260" height="95" rx="10" class="box"/><text x="1510" y="673" class="sh">Recovery Services Vault</text><text x="1510" y="696" class="mono">rsv-enterprise-dev-uks</text><text x="1510" y="717" class="tiny">Geo-redundant backup • soft delete</text><text x="1510" y="735" class="tiny">Cross-subscription restore capability</text>
+
+<!-- IaC connection -->
+<path d="M360 250 L390 250" class="arrow"/>
+<text x="375" y="235" text-anchor="middle" class="tiny">Terraform</text>
+<path d="M1355 300 L1470 220" class="arrow dash"/>
+<text x="1415" y="240" text-anchor="middle" class="tiny">secure storage</text>
+<path d="M1355 560 L1470 600" class="arrow dash"/>
+<text x="1410" y="585" text-anchor="middle" class="tiny">recovery</text>
+<path d="M915 570 L915 875" class="arrow dash"/>
+<text x="945" y="735" class="tiny">telemetry</text>
+
+<!-- Footer -->
+<rect x="30" y="430" width="330" height="340" rx="14" class="panel"/>
+<text x="195" y="460" text-anchor="middle" class="h">Engineering Principles</text>
+<text x="55" y="500" class="sh">Secure by Design</text><text x="55" y="522" class="small">Segmentation, restricted access, Bastion,</text><text x="55" y="539" class="small">SSH keys, TLS enforcement and RBAC.</text>
+<text x="55" y="580" class="sh">Observable</text><text x="55" y="602" class="small">Centralized monitoring, telemetry,</text><text x="55" y="619" class="small">metric and query-based alerting.</text>
+<text x="55" y="660" class="sh">Recoverable</text><text x="55" y="682" class="small">Storage recovery plus Azure backup</text><text x="55" y="699" class="small">services and Terraform reconstruction.</text>
+<text x="55" y="740" class="sh">Automated with IaC</text><text x="55" y="758" class="small">Terraform state, drift detection, Git.</text>
+
+<text x="900" y="1015" text-anchor="middle" class="small">Project scope: Azure enterprise-style infrastructure for cloud / infrastructure engineering portfolio demonstration</text>
+<text x="900" y="1040" text-anchor="middle" class="tiny">Resources and names reflect the reconciled Azure environment documented in the project.</text>
+</svg>

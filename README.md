@@ -4,7 +4,7 @@
 
 This project demonstrates the design and implementation of a secure and supportable Microsoft Azure infrastructure environment for a fictional organization.
 
-The project is being developed as a hands-on cloud engineering environment to demonstrate practical implementation across cloud infrastructure, networking, identity, security, monitoring, automation and Infrastructure as Code.
+The project was developed as a hands-on cloud engineering environment to demonstrate practical implementation across cloud infrastructure, networking, identity, security, monitoring, recovery, automation, and Infrastructure as Code.
 
 ## Business Scenario
 
@@ -36,9 +36,23 @@ This project will progressively use:
 - Azure Storage
 - Azure Monitor
 
+## Architecture
+
+The project implements a segmented, security-focused Azure enterprise environment with private Linux compute, controlled outbound connectivity, centralized monitoring, backup and recovery, and Terraform-based Infrastructure as Code management.
+
+![Azure Enterprise Infrastructure Architecture](docs/images/azure-enterprise-architecture.png)
+
+### Architecture Documentation
+
+For the complete technical design, engineering decisions, security model, monitoring architecture, recovery strategy, and Terraform adoption workflow, see:
+
+[View Full Architecture Documentation](docs/architecture.md)
+
+
 ## Project Status
 
-🟡 In Progress
+🟢 Completed
+
 
 ### Completed
 
@@ -448,8 +462,7 @@ This test demonstrated that the environment can recover protected business data 
 11. ✅ Infrastructure testing
     - [View Infrastructure Testing Results](docs/infrastructure-testing.md)
 12. ✅ Terraform Infrastructure as Code
-13. ⬜ Final architecture documentation
-
+13. ✅ Final architecture documentation
 
 
 ## Phase 12 — Terraform Infrastructure as Code
