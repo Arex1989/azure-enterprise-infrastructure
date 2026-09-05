@@ -1,53 +1,61 @@
 # Azure Enterprise Infrastructure
 
-## Project Overview
+> **End-to-end Azure cloud engineering portfolio demonstrating secure infrastructure design, private networking, identity and RBAC, Linux compute, monitoring, backup and recovery, patch management, Terraform Infrastructure as Code, FinOps, and controlled infrastructure decommissioning.**
 
-This project demonstrates the design and implementation of a secure and supportable Microsoft Azure infrastructure environment for a fictional organization.
+## Executive Summary
 
-The project was developed as a hands-on cloud engineering environment to demonstrate practical implementation across cloud infrastructure, networking, identity, security, monitoring, recovery, automation, and Infrastructure as Code.
+This project demonstrates the design, deployment, operation, validation, and controlled retirement of a security-focused Microsoft Azure environment for a fictional enterprise organization.
 
-## Business Scenario
+Rather than focusing only on resource deployment, the project covers the complete cloud infrastructure lifecycle: architecture, networking, identity, security, compute, monitoring, backup and recovery, operational management, Infrastructure as Code, cost governance, troubleshooting, and decommissioning.
 
-A growing organization requires a secure, scalable and supportable Azure environment for hosting business workloads while maintaining controlled access, operational visibility, data protection and repeatable infrastructure delivery.
+The environment was built and validated through hands-on implementation using the Azure Portal, Azure CLI, Linux, KQL, and Terraform.
 
-The infrastructure must provide:
+## Key Engineering Outcomes
 
-- Segmented cloud networking
-- Secure access to workloads
-- Identity and role-based access control
-- Windows and Linux compute resources
-- Cloud storage
-- Infrastructure monitoring and alerting
-- Backup and recovery
-- Repeatable infrastructure deployment
+- Designed a segmented Azure virtual network using dedicated web, application, and management subnets
+- Implemented NSGs, private VM architecture, Azure Bastion, NAT Gateway, and controlled outbound connectivity
+- Applied Microsoft Entra ID group-based RBAC and system-assigned managed identities
+- Secured Azure Storage using restricted network access, TLS, versioning, and soft-delete protection
+- Implemented centralized observability with Azure Monitor, Log Analytics, diagnostic settings, KQL, alerts, and Action Groups
+- Deployed and secured a private Ubuntu Linux workload with no VM-level public IP address
+- Implemented and validated Azure Backup, recovery points, alternate-storage recovery, and VM backup
+- Implemented Azure Update Manager assessment, patch installation, and post-patching compliance validation
+- Adopted Terraform to manage Azure infrastructure through repeatable Infrastructure as Code workflows
+- Troubleshot real Azure dependency, authorization, monitoring, backup-retention, and Terraform state issues
+- Performed controlled infrastructure decommissioning with Terraform state reconciliation
+- Implemented Azure Cost Management analysis and a monthly FinOps budget with progressive and forecast alerts
 
-## Technologies
+## Technology Stack
 
-This project will progressively use:
-
-- Microsoft Azure
-- Microsoft Entra ID
-- Azure Virtual Network
-- Network Security Groups
-- Azure Virtual Machines
-- Azure Bastion
-- Azure NAT Gateway
-- Azure Network Watcher
-- Azure Storage
-- Azure Monitor
+**Cloud:** Microsoft Azure
+**Infrastructure as Code:** Terraform
+**Identity & Access:** Microsoft Entra ID, Azure RBAC, Managed Identity
+**Networking:** Azure Virtual Network, Subnets, NSGs, NAT Gateway, Azure Bastion
+**Compute:** Azure Virtual Machines, Ubuntu Linux
+**Storage:** Azure Blob Storage
+**Monitoring:** Azure Monitor, Log Analytics, KQL, Action Groups
+**Security:** Microsoft Defender for Cloud, Trusted Launch, Secure Boot, vTPM
+**Backup & Recovery:** Azure Backup, Recovery Services Vault, Azure Data Protection
+**Operations:** Azure Update Manager, Azure CLI
+**FinOps:** Azure Cost Management, Budgets, Cost Alerts
 
 ## Architecture
 
-The project implements a segmented, security-focused Azure enterprise environment with private Linux compute, controlled outbound connectivity, centralized monitoring, backup and recovery, and Terraform-based Infrastructure as Code management.
+The solution implements a segmented, security-focused Azure environment with private Linux compute, controlled outbound connectivity, centralized monitoring, backup and recovery, identity-based access control, and Terraform-managed infrastructure.
 
 ![Azure Enterprise Infrastructure Architecture](docs/images/azure-enterprise-architecture.png)
 
 ### Architecture Documentation
 
-For the complete technical design, engineering decisions, security model, monitoring architecture, recovery strategy, and Terraform adoption workflow, see:
+For the complete technical design, engineering decisions, security model, monitoring architecture, recovery strategy, and Terraform adoption workflow:
 
 [View Full Architecture Documentation](docs/architecture.md)
 
+## Infrastructure Lifecycle
+
+**Design -> Deploy -> Secure -> Monitor -> Backup -> Recover -> Operate -> Patch -> Optimize -> Decommission**
+
+The project intentionally includes controlled infrastructure retirement to demonstrate lifecycle management beyond initial provisioning.
 
 ## Project Status
 
@@ -112,13 +120,13 @@ For the complete technical design, engineering decisions, security model, monito
 - Validated outbound HTTPS connectivity through the NAT Gateway with a successful HTTP/2 200 response
 - Validated Ubuntu repository connectivity and successful package-index retrieval from the private VM
 
-### Current Phase
+### Lifecycle Status
 
-Compute deployment and private-network connectivity validation are complete.
+**Completed / Decommissioned**
 
-The environment now includes validated networking, Microsoft Entra ID and Azure RBAC, secure Blob Storage, Azure Monitor and Log Analytics, alerting, Azure Backup and recovery, and a private Linux compute workload with secure Bastion administration and NAT Gateway outbound connectivity.
+The complete Azure infrastructure lifecycle has been implemented and validated, including networking, identity and RBAC, secure storage, private Linux compute, monitoring and alerting, backup and recovery, security controls, patch management, Terraform Infrastructure as Code, FinOps, and controlled decommissioning.
 
-The next phase will expand infrastructure testing and operational validation before progressing to Terraform Infrastructure as Code.
+Major billable infrastructure has been retired. The remaining Recovery Services Vault is retained temporarily because of Azure Backup platform retention controls and remains represented in Terraform state for controlled final cleanup.
 
 ## Resource Organisation
 
