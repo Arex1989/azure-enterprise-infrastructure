@@ -966,3 +966,145 @@ The post-patching assessment reported no remaining updates, confirming that the 
 ![Azure VM Update Assessment Compliant](screenshots/updates/update-assessment-compliant.png)
 
 This implementation demonstrates an operational Azure patch-management workflow combining update assessment, controlled remediation, deployment tracking and post-patching compliance validation.
+
+---
+
+## Infrastructure Lifecycle & Decommissioning
+
+After completing deployment, security, monitoring, backup, recovery, and patch-management validation, the Azure Enterprise Infrastructure environment entered a controlled decommissioning phase.
+
+The objective was to retire the lab safely while maintaining Terraform state consistency, resolving Azure resource dependencies, and minimizing residual cloud costs.
+
+### Decommissioning Strategy
+
+The environment was decommissioned using Terraform and Azure CLI.
+
+A Terraform destroy plan was generated and reviewed before execution:
+
+    terraform plan -destroy -out=destroy.tfplan
+    terraform show destroy.tfplan
+
+Resource destruction was validated against both Terraform state and the Azure control plane.
+
+### Dependency-Aware Cleanup
+
+Several Azure services required dependency cleanup before their parent resources could be removed. The teardown included:
+
+- Azure Monitor Data Collection Rule association removal
+- Azure Monitor Agent extension removal
+- VM power-state management for extension operations
+- Azure Backup protection disablement
+- Backup recovery-point deletion
+- Azure Data Protection backup-instance cleanup
+- Backup policy removal
+- Storage resource-lock validation and removal
+- Network dependency cleanup
+- Terraform state reconciliation after Azure CLI operations
+
+This demonstrated that infrastructure decommissioning is not always the exact reverse of deployment. Stateful Azure services can introduce retention policies, soft-delete protection, asynchronous operations, and dependency constraints that must be handled independently.
+
+### Azure Backup and Recovery Services Lifecycle
+
+Azure Backup introduced additional lifecycle considerations during decommissioning.
+
+Protection for the Linux VM was stopped and its associated backup data was deleted. Azure subsequently reported the protected workload with the following lifecycle state:
+
+    ProtectionState: ProtectionStopped
+    RegistrationStatus: SoftDeleted
+
+The Recovery Services Vault retained the soft-deleted backup container because of Azure Backup retention and enhanced security controls.
+
+An attempt to disable Recovery Services Vault soft delete was rejected by the Azure control plane because the vault security configuration did not permit that operation.
+
+Rather than forcibly removing the vault from Terraform state, the Recovery Services Vault and its containing resource group were intentionally retained until Azure completes the applicable retention lifecycle.
+
+This preserves Terraform state integrity and prevents the infrastructure definition from incorrectly reporting the environment as completely destroyed while Azure still retains the vault.
+
+### Terraform State Reconciliation
+
+Some Azure dependencies were removed directly through Azure CLI when platform constraints prevented Terraform from completing the original destroy operation.
+
+Terraform state was therefore repeatedly compared with the Azure control plane using:
+
+    terraform state list
+
+Azure CLI resource queries were also used to verify which resources still physically existed.
+
+During the teardown, the destroy plan was regenerated whenever infrastructure state changed. This prevented stale Terraform plans from being applied after out-of-band Azure operations.
+
+The reconciliation process distinguished between:
+
+- Resources successfully destroyed by Terraform
+- Resources removed through Azure CLI to resolve dependencies
+- Resources already absent from Azure but still represented during intermediate state transitions
+- Resources intentionally retained because of Azure platform retention behavior
+
+This approach maintained consistency between infrastructure-as-code state and the actual Azure environment throughout decommissioning.
+
+### Cost Validation and FinOps Controls
+
+Azure Cost Management was reviewed after the teardown to identify the primary cost drivers and verify that the removal of the lab infrastructure significantly reduced ongoing consumption.
+
+For the September 2026 observation period, the major service costs included:
+
+| Service | Approximate Cost |
+|---|---:|
+| NAT Gateway | EUR 3.52 |
+| Azure Backup | EUR 0.78 |
+| Storage | EUR 0.47 |
+| Virtual Network | EUR 0.39 |
+| Azure Monitor | EUR 0.05 |
+
+The analysis identified NAT Gateway as the dominant infrastructure cost during the observed period. This reinforced the importance of lifecycle management for continuously billed cloud resources in development and portfolio environments.
+
+A recurring Azure portfolio budget of USD 20 per month was configured as an additional FinOps control.
+
+Budget notifications were configured at:
+
+- 50% actual cost
+- 75% actual cost
+- 90% actual cost
+- 100% actual cost
+- 100% forecasted cost
+
+This provides both progressive spending alerts and an early warning when Azure predicts that monthly expenditure will exceed the portfolio budget.
+
+### Decommissioning Outcome
+
+The major billable infrastructure components were successfully removed, including:
+
+- Linux virtual machine
+- Managed OS disk
+- Network interface
+- NAT Gateway and associated public IP
+- Azure Monitor VM extension
+- Data Collection Rule association
+- Storage resources
+- Azure Data Protection backup resources
+- Application subnet dependencies
+- Virtual network dependencies
+
+The Recovery Services Vault and its containing resource group remain under controlled lifecycle management until Azure permits final deletion following the applicable backup retention process.
+
+Terraform continues to retain these remaining resources in state so that final destruction can be completed through the infrastructure-as-code workflow once Azure releases the platform-level dependency.
+
+### Engineering Lessons
+
+The decommissioning phase demonstrated several practical cloud-engineering principles:
+
+1. Infrastructure lifecycle management includes both provisioning and safe retirement.
+2. Terraform state should remain aligned with the actual Azure control plane.
+3. Saved Terraform plans become stale when infrastructure state changes and must be regenerated.
+4. Azure soft-delete and retention controls can intentionally prevent immediate resource destruction.
+5. Dependency relationships must be resolved before parent resources can be removed.
+6. Out-of-band Azure CLI operations require subsequent Terraform state reconciliation.
+7. Cloud cost analysis should be performed after teardown to identify persistent or unexpectedly expensive services.
+8. Budgets and forecast alerts provide an additional FinOps control for future cloud deployments.
+
+### Full Infrastructure Lifecycle
+
+This project demonstrates the lifecycle of an Azure environment from architecture through controlled retirement:
+
+**Design -> Deploy -> Secure -> Monitor -> Backup -> Recover -> Operate -> Patch -> Optimize -> Decommission**
+
+The environment was not simply deleted at the end of the lab. It was deliberately retired through dependency analysis, Terraform state reconciliation, Azure Backup lifecycle management, cost validation, and controlled handling of Azure retention mechanisms.
