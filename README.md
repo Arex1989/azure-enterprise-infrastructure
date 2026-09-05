@@ -27,17 +27,19 @@ The environment was built and validated through hands-on implementation using th
 
 ## Technology Stack
 
-**Cloud:** Microsoft Azure
-**Infrastructure as Code:** Terraform
-**Identity & Access:** Microsoft Entra ID, Azure RBAC, Managed Identity
-**Networking:** Azure Virtual Network, Subnets, NSGs, NAT Gateway, Azure Bastion
-**Compute:** Azure Virtual Machines, Ubuntu Linux
-**Storage:** Azure Blob Storage
-**Monitoring:** Azure Monitor, Log Analytics, KQL, Action Groups
-**Security:** Microsoft Defender for Cloud, Trusted Launch, Secure Boot, vTPM
-**Backup & Recovery:** Azure Backup, Recovery Services Vault, Azure Data Protection
-**Operations:** Azure Update Manager, Azure CLI
-**FinOps:** Azure Cost Management, Budgets, Cost Alerts
+| Area | Technologies |
+|---|---|
+| **Cloud** | Microsoft Azure |
+| **Infrastructure as Code** | Terraform |
+| **Identity & Access** | Microsoft Entra ID, Azure RBAC, Managed Identity |
+| **Networking** | Azure Virtual Network, Subnets, NSGs, NAT Gateway, Azure Bastion |
+| **Compute** | Azure Virtual Machines, Ubuntu Linux |
+| **Storage** | Azure Blob Storage |
+| **Monitoring** | Azure Monitor, Log Analytics, KQL, Action Groups |
+| **Security** | Microsoft Defender for Cloud, Trusted Launch, Secure Boot, vTPM |
+| **Backup & Recovery** | Azure Backup, Recovery Services Vault, Azure Data Protection |
+| **Operations** | Azure Update Manager, Azure CLI |
+| **FinOps** | Azure Cost Management, Budgets, Cost Alerts |
 
 ## Architecture
 
